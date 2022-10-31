@@ -6,7 +6,20 @@
 
 #ifdef LIB_PPROPERTIES
 #else
-#pragma comment(lib,"LibProperties.lib")
+	#ifdef _WIN64
+		#ifdef _DEBUG
+			#pragma comment(lib,"LibProperties-x64-d.lib")
+		#else
+			#pragma comment(lib,"LibProperties-x64.lib")
+		#endif
+	#elif _WIN32
+		#ifdef _DEBUG
+			#pragma comment(lib,"LibProperties-x86-d.lib")
+		#else
+			#pragma comment(lib,"LibProperties-x86.lib")
+		#endif
+	#endif
+
 #endif // LIB_PPROPERTIES
 
 
