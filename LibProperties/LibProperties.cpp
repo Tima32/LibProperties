@@ -202,10 +202,6 @@ namespace lp
 			if (ft[0] == 65279)
 				ft.erase(ft.begin(), ft.begin() + 1);
 
-			cout << "--Read file begin--" << endl;
-			wcout << ft << endl;
-			cout << "--Read file end--" << endl;
-
 			lp_stringstream st{ ft.data() };
 
 			while (1)
@@ -215,8 +211,6 @@ namespace lp
 				if (!st)
 					break;
 				strings.push_back(ParseStr(s));
-				wcout << L"strings[n]: " << strings[strings.size() - 1].str << L" " <<
-					strings[strings.size() - 1].str.size() << endl;
 			}
 		}
 
@@ -256,7 +250,6 @@ namespace lp
 		{
 			if (es.str.size())
 			{
-				wcout << es.str << L" " << es.str.size() << endl;
 				fwrite(&es.str[0], sizeof(lp_char), es.str.size(), file);
 			}
 			fwrite(TEXT("\n"), sizeof(lp_char), 1, file);
