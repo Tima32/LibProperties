@@ -54,9 +54,8 @@ namespace lp
 		}
 	}
 
-
-	lp::LibPropertiesMemory::LibPropertiesMemory(bool save_default) :
-		save_default(save_default)
+	LibPropertiesMemory::LibPropertiesMemory(std::map<lp_string, lp_string>&& data) noexcept :
+		std::map<lp_string, lp_string>(data)
 	{
 	}
 

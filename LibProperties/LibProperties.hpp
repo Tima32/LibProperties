@@ -42,7 +42,10 @@ namespace lp
 	class LibPropertiesMemory : public std::map<lp_string, lp_string>
 	{
 	public:
-		LibPropertiesMemory(bool save_default = true);
+
+		LibPropertiesMemory() = default;
+		LibPropertiesMemory(const std::map<lp_string, lp_string>& data);
+		LibPropertiesMemory(std::map<lp_string, lp_string>&& data) noexcept;
 		~LibPropertiesMemory();
 
 		bool loadFromFile(const lp_string& file_name);
@@ -58,6 +61,5 @@ namespace lp
 
 	private:
 		lp_string file_name;
-		bool save_default;
 	};
 }
