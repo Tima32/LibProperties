@@ -1,5 +1,5 @@
 #include <iostream>
-#include "LibProperties\LibProperties.hpp"
+#include "LibProperties/LibProperties.hpp"
 
 using namespace std;
 
@@ -11,12 +11,12 @@ int main()
 	p[TEXT("password")] = TEXT("root");
 	p[TEXT("read_counter")] = TEXT("0");
 
-	if (!p.insertFromFile(L"config.properties"))
+	if (!p.insertFromFile(TEXT("config.properties")))
 	{
 		cout << "Error open." << endl;
 	}
 
-	wstring login, password;
+	lp::lp_string login, password;
 	size_t read_counter{ 0 };
 
 	login = p[TEXT("login")];
@@ -26,10 +26,14 @@ int main()
 		wcout << L"Error geting read_counter" << endl;
 	}
 
-	wcout << login << L" " << password << L" " << read_counter << endl;
+	lp::lp_cout << login << TEXT(" ") << password << TEXT(" ") << read_counter << endl;
 
 	read_counter++;
-	p[TEXT("read_counter")] = to_wstring(read_counter);
+#ifdef _WIN32
+		p[TEXT("read_counter")] = to_wstring(read_counter);
+#elif __linux__
+		p[TEXT("read_counter")] = to_string(read_counter);
+#endif
 
 	p.saveToFile();
 	

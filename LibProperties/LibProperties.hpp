@@ -3,6 +3,7 @@
 #include <string>
 #include <sstream>
 #include <map>
+#include <iostream>
 
 #ifdef LIB_PPROPERTIES
 #else
@@ -29,10 +30,13 @@ namespace lp
 	using lp_string = std::wstring;
 	using lp_char = wchar_t;
 	using lp_stringstream = std::wstringstream;
+	static auto& lp_cout = std::wcout;
 #define TEXT(quote) L##quote
 #elif __linux__
 	using lp_string = std::string;
 	using lp_char = char;
+	using lp_stringstream = std::stringstream;
+	static auto& lp_cout = std::cout;
 #define TEXT(quote) quote
 #else
 #error Unknown operating system.

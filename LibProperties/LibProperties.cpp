@@ -4,6 +4,19 @@
 
 using namespace std;
 
+// #ifdef __unix
+// #define fopen_s(pFile,filename,mode) ((*(pFile))=fopen((filename),(mode)))==NULL
+// #endif
+
+static int fopen_s(FILE **f, const char *name, const char *mode) {
+    int ret = 0;
+    *f = fopen(name, mode);
+    /* Can't be sure about 1-to-1 mapping of errno and MS' errno_t */
+    if (!*f)
+        ret = errno;
+    return ret;
+}
+
 namespace lp
 {
 	//автоматически закрывает файл
@@ -72,7 +85,13 @@ namespace lp
 	{
 		this->file_name = file_name;
 		FILE* file{ nullptr };
+
+#ifdef _WIN32
 		auto open_err = _wfopen_s(&file, file_name.c_str(), L"rt, ccs=UTF-8");
+#elif __linux__
+		int open_err = fopen_s(&file, file_name.c_str(), "rt, ccs=UTF-8");
+#endif
+		
 		FileCloseControl fc(file);
 		if (file == nullptr || open_err)
 			return false;
@@ -107,10 +126,10 @@ namespace lp
 			}
 
 			//Обработка повриждений файла
-			else if ((buff == L'\n' && read_name != L"") || //Обрыв имени
-				(buff == L' ' && read_name != L"") ||       //Обрыв имени (не найден знак конца имени)
-				(feof(file) && read_name != L"") ||         //Обрыв файла
-				(buff == L'=' && read_name == L""))         //Днные указанны без имени
+			else if ((buff == TEXT('\n') && read_name != TEXT("")) || //Обрыв имени
+				(buff == TEXT(' ') && read_name != TEXT("")) ||       //Обрыв имени (не найден знак конца имени)
+				(feof(file) && read_name != TEXT("")) ||         //Обрыв файла
+				(buff == TEXT('=') && read_name == TEXT("")))         //Днные указанны без имени
 			{
 				return false;
 			}
@@ -122,8 +141,8 @@ namespace lp
 			}
 
 			//запись символов имени
-			else if (buff != L' ' &&
-				buff != L'\n')
+			else if (buff != TEXT(' ') &&
+				buff != TEXT('\n'))
 			{
 				read_name += buff;
 			}
@@ -140,7 +159,7 @@ namespace lp
 	bool LibPropertiesMemory::saveToFile(const lp_string& file_name) const
 	{
 		FILE* file{ nullptr };
-		errno_t open_err;
+		int open_err;
 		fpos_t size{ 0 };
 		lp_string ft;
 
@@ -180,7 +199,11 @@ namespace lp
 		};
 		vector<pars_str> strings;
 
+#ifdef _WIN32
 		open_err = _wfopen_s(&file, file_name.c_str(), L"rt, ccs=UTF-8");
+#elif __linux__
+		open_err = fopen_s(&file, file_name.c_str(), "rt");
+#endif
 
 		if (open_err == ENOENT)
 			goto combining_tables;
@@ -194,9 +217,15 @@ namespace lp
 			fgetpos(file, &size);
 			fseek(file, 0, SEEK_SET);
 
-			ft.resize(size + 1, 0);
-			fread(&ft[0], sizeof(lp_char), size, file);
-			fclose(file);
+#ifdef _WIN32
+		ft.resize(size + 1, 0);
+		fread(&ft[0], sizeof(lp_char), size, file);
+		fclose(file);
+#elif __linux__
+		ft.resize(size.__pos, 0);
+		fread(&ft[0], sizeof(lp_char), size.__pos, file);
+		fclose(file);
+#endif
 
 			if (ft[0] == 65279)
 				ft.erase(ft.begin(), ft.begin() + 1);
@@ -241,7 +270,11 @@ namespace lp
 		}
 
 
+#ifdef _WIN32
 		open_err = _wfopen_s(&file, file_name.c_str(), L"wt, ccs=UTF-8");
+#elif __linux__
+		open_err = fopen_s(&file, file_name.c_str(), "wt");
+#endif
 		if (file == nullptr || open_err)
 			return false;
 
