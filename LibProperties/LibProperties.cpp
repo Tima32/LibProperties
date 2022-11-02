@@ -4,10 +4,7 @@
 
 using namespace std;
 
-// #ifdef __unix
-// #define fopen_s(pFile,filename,mode) ((*(pFile))=fopen((filename),(mode)))==NULL
-// #endif
-
+#ifdef __linux__
 static int fopen_s(FILE **f, const char *name, const char *mode) {
     int ret = 0;
     *f = fopen(name, mode);
@@ -16,6 +13,7 @@ static int fopen_s(FILE **f, const char *name, const char *mode) {
         ret = errno;
     return ret;
 }
+#endif
 
 namespace lp
 {
